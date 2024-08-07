@@ -1,0 +1,68 @@
+---
+title: "Statistics Assignment"
+author: "Maria Zatsepin"
+date: "February 18, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+ This report is going to show the investigation of the exponential distribution in R and compare it with the Central Limit Theorem. Central Limit Theorem states that as a number of observation gets larger the distributin of the averages becomes that of a standard normal distribution. 
+ 
+This will be shown by comparison of means and standard deviations of distribution of 1000 simulation of random exponentials and distribution of 1000 averages of 40 random exponentials. The lambda used here is 0.2. The population mean and standard deiation for exponential distibutin is 1/lambda.
+ 
+ 
+Here is R code for creating single_exp variable which is simulation of 1000 exponentials, and multi_exp variable which are simulation of 1000 means of 40 exponentials randoms each. Histograms of both distribution are attached below. 
+
+For both distribution means and standard deviation are calculated and sumarized in table (data_sum) together with means and sd for  exponential population values (1/lambda) and for the CLT that states that the distribution of means will be as X ~ N(mean, std.error) - In our case, X~N(1/0.2, (1/0.2)/sqrt(1000)).
+
+```{r echo=TRUE}
+single_exp <- rexp(1000, 0.2)
+
+data_sum <- data.frame(row.names = c("sinlge simulation", "single population", 
+                                     "multi simulation", "CLT normal distribution"))
+data_sum[1,1] <- mean(single_exp)
+data_sum[1,2] <- sd(single_exp)
+data_sum[2,] <- 1/0.2 
+
+multi_exp = NULL
+for (i in 1 : 1000) multi_exp = c(multi_exp, mean(rexp(40, 0.2)))
+
+data_sum[3,1] <- mean(multi_exp)
+data_sum[3,2] <- sd(multi_exp)
+data_sum[4,1] <-  1/0.2 
+data_sum[4,2] <- (1/0.2)/sqrt(40) 
+colnames(data_sum) <- c("mean","sd")
+print(data_sum)
+```
+
+As we can see - for taking distribution of 1000 exponentials the mean (blue on the histogram) and the population mean (red on histogram) are very close, and the distribution is expoentials. 
+But when we look at the distribution of the averages of 40 exponentials - the distribution look much more normal tan exponential, with mean as the origin mean=1/lambda and standard deviation very close to standard error of the initial exponential distribution, means sigma/sqrt(n)=1/lambda/sqrt(40) just as you dcan see in the table above. In the histogram mean(dotted) and sd of the simulation are green and of a standard expected distribution (according to CLT) are red.
+
+As you can see by the density line of the second distribution (multi_exp) the density is much more similar to normal distribution curve than the density of regular exponential distribution. If we enlarge the n from 40 to higher number (1000, for example) we eventually will get a normal distribution - black line on histogram.
+
+
+```{r echo=TRUE}
+hist(single_exp, prob=TRUE)
+abline(v=mean(single_exp), col="blue", lty=3, lwd=4)
+abline(v=1/0.2, col="red", lty=3, lwd=4)
+abline(v=c(mean(single_exp)-sd(single_exp), mean(single_exp)+sd(single_exp)), col="blue", lwd=2)
+abline(v=c(1/0.2-1/0.2, 1/0.2+ 1/0.2), col="red", lwd=2)
+lines(density(single_exp), col= "blue")
+
+
+hist(multi_exp, prob=TRUE)
+abline(v=mean(single_exp), col="green4", lty=3, lwd=4)
+abline(v=1/0.2, col="red", lty=3, lwd=4)
+abline(v=c(mean(multi_exp)-sd(multi_exp), mean(multi_exp)+sd(multi_exp)), col="green4", lwd=2)
+abline(v=c(1/0.2-(1/0.2)/sqrt(40) , 1/0.2+ (1/0.2)/sqrt(40)), col="red", lwd=2)
+lines(density(multi_exp), col= "green4")
+x <- rnorm (1000, mean=5, sd=5/sqrt(40))
+curve(dnorm(x, mean=5, sd=5/sqrt(40)), add=TRUE, lwd=3 )
+
+
+
+```
+
+
